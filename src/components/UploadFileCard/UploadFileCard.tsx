@@ -19,9 +19,10 @@ import {
 import { Amplify } from 'aws-amplify';
 import { uploadData } from '@aws-amplify/storage';
 import { 
-    AmazonAIPredictionsProvider,
-    identifyText,
-    interpretText 
+    loadTextIdentification,
+    loadTextInterpretation,
+    type TextIdentificationOutput,
+    type TextInterpretationOutput 
 } from '@aws-amplify/predictions';
 
 type StorageAccessLevel = 'guest' | 'private' | 'protected';
@@ -114,7 +115,7 @@ const UploadFileCard: FC<UploadFileCardProps> = ({ level }) => {
             console.log("Error uploading file: ", error);
         }
     };
-    
+
     const onIdentify = async (file: File): Promise<IdentifyResponse | null> => {
         try {
             const respPrediction = await identifyText({

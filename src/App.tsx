@@ -5,19 +5,19 @@ import Main from "./screen/Main/Main";
 
 const client = generateClient<Schema>();
 
-// Define view type for better type safety
+// Define type for storage access level
 type StorageAccessLevel = 'guest' | 'private' | 'protected';
-type View = 'todos' | 'files';
 
 function App() {
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
-  const [currentView, setCurrentView] = useState<View>('todos');
+  const [currentView, setCurrentView] = useState<'todos' | 'files'>('todos');
   const [fileLevel, setFileLevel] = useState<StorageAccessLevel>('private');
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
+    const sub = client.models.Todo.observeQuery().subscribe({
       next: (data) => setTodos([...data.items]),
     });
+    return () => sub.unsubscribe();
   }, []);
 
   function createTodo() {
@@ -47,7 +47,7 @@ function App() {
           <select 
             value={fileLevel} 
             onChange={(e) => setFileLevel(e.target.value as StorageAccessLevel)}
-            >
+          >
             <option value="private">Private Files</option>
             <option value="protected">Protected Files</option>
             <option value="guest">Guest Files</option>
